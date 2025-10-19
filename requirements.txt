@@ -1,6 +1,6 @@
 Flask==3.0.0
 transformers==4.36.0
-sentencepiece==0.1.99
-torch==2.1.0
+torch>=2.2.0
 Werkzeug==3.0.1
+sacremoses
 
