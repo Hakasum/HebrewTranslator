@@ -1,5 +1,6 @@
 Flask==3.0.0
 transformers>=4.40.0
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.2.0
 sentencepiece>=0.1.99
 Werkzeug==3.0.1

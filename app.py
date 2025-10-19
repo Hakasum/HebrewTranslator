@@ -1,4 +1,6 @@
 import os
+import gc
+import torch
 from transformers import MarianMTModel, MarianTokenizer
 from flask import Flask, request, jsonify
 
@@ -16,16 +18,26 @@ def initialize_translator():
     """
     Initialize the translation model and tokenizer.
     Downloads the model on first run if not already cached.
+    Optimized for low memory environments.
     """
     global model, tokenizer
     
     print("Loading English to Hebrew translation model...")
     print(f"Model: {MODEL_NAME}")
     
-    # Load tokenizer and model
+    # Load tokenizer and model with memory optimizations
     # These will be downloaded on first run and cached locally
     tokenizer = MarianTokenizer.from_pretrained(MODEL_NAME)
-    model = MarianMTModel.from_pretrained(MODEL_NAME)
+    
+    # Load model with low memory optimizations
+    model = MarianMTModel.from_pretrained(
+        MODEL_NAME,
+        low_cpu_mem_usage=True,
+        torch_dtype="auto"
+    )
+    
+    # Set to evaluation mode to reduce memory
+    model.eval()
     
     print("Translator initialized successfully!")
 
@@ -55,10 +67,15 @@ def translate():
         if not text.strip():
             return jsonify({"error": "Text cannot be empty"}), 400
         
-        # Tokenize and translate the text
-        inputs = tokenizer([text], return_tensors="pt", padding=True)
-        translated = model.generate(**inputs)
-        translation = tokenizer.decode(translated[0], skip_special_tokens=True)
+        # Tokenize and translate the text with memory optimization
+        with torch.no_grad():  # Disable gradient calculation to save memory
+            inputs = tokenizer([text], return_tensors="pt", padding=True)
+            translated = model.generate(**inputs, max_length=512)
+            translation = tokenizer.decode(translated[0], skip_special_tokens=True)
+        
+        # Clean up
+        del inputs, translated
+        gc.collect()
         
         return jsonify({"translation": translation}), 200
     
