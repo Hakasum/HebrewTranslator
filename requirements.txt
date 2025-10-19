@@ -1,0 +1,4 @@
+Flask==3.0.0
+argostranslate==1.9.1
+Werkzeug==3.0.1
+
