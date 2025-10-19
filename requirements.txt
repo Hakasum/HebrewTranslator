@@ -1,4 +1,5 @@
 Flask==3.0.0
 argostranslate==1.9.1
+ctranslate2==4.6.0
 Werkzeug==3.0.1
 
