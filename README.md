@@ -1,6 +1,6 @@
 # Hebrew Translator API
 
-A local REST API for translating English text to Hebrew using Argos Translate. The API uses Flask and provides a simple POST endpoint for translation requests.
+A local REST API for translating English text to Hebrew using HuggingFace Transformers with the Helsinki-NLP MarianMT model. The API uses Flask and provides a simple POST endpoint for translation requests.
 
 ## Features
 
@@ -50,7 +50,7 @@ docker run -p 5005:5005 hebrew-translator
 On first run, the model will be downloaded inside the container. To persist the model across container restarts, you can mount a volume:
 
 ```bash
-docker run -p 5005:5005 -v hebrew-translator-data:/root/.local/share/argos-translate hebrew-translator
+docker run -p 5005:5005 -v hebrew-translator-data:/root/.cache/huggingface hebrew-translator
 ```
 
 ## API Usage
@@ -126,20 +126,20 @@ The API returns appropriate HTTP status codes:
 
 ## Offline Usage
 
-After the initial model download, the API works completely offline. The translation model is stored locally in:
+After the initial model download, the API works completely offline. The translation model is cached locally by HuggingFace in:
 
-- **Linux/Mac:** `~/.local/share/argos-translate/packages/`
-- **Windows:** `%LOCALAPPDATA%\argos-translate\packages\`
-- **Docker:** Inside the container at `/root/.local/share/argos-translate/packages/`
+- **Linux/Mac:** `~/.cache/huggingface/hub/`
+- **Windows:** `%USERPROFILE%\.cache\huggingface\hub\`
+- **Docker:** Inside the container at `/root/.cache/huggingface/hub/`
 
 ## Technical Details
 
 - **Framework:** Flask 3.0.0
-- **Translation Engine:** Argos Translate 1.9.1
-- **Model:** English to Hebrew (en_he.argosmodel)
+- **Translation Engine:** HuggingFace Transformers 4.36.0
+- **Model:** Helsinki-NLP/opus-mt-en-he (MarianMT)
 - **Port:** 5005 (configurable via PORT environment variable)
 
 ## License
 
-This project uses Argos Translate, which is licensed under the MIT License. The translation models are from Argos Open Tech.
+This project uses HuggingFace Transformers and Helsinki-NLP models, which are open-source and free to use. The MarianMT models are from the OPUS-MT project.
 
