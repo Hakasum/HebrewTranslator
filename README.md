@@ -14,6 +14,9 @@ A local REST API for translating English text to Hebrew using HuggingFace Transf
 
 - Python 3.11+ (for local installation)
 - Docker (for containerized deployment)
+- **Minimum 1GB RAM** for running the translation model
+
+> ⚠️ **Note:** Free-tier hosting services with 512MB RAM (like Render free tier) may run out of memory. See [DEPLOYMENT.md](DEPLOYMENT.md) for hosting recommendations.
 
 ## Installation
 
