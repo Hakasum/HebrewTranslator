@@ -38,6 +38,11 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-# Argos Translate models (will be downloaded on first run)
+# Translation models (will be downloaded on first run)
 .local/
+
+# Node/npm (not needed for Python project)
+node_modules/
+package.json
+package-lock.json
 
