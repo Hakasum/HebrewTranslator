@@ -11,9 +11,10 @@ app = Flask(__name__)
 model = None
 tokenizer = None
 
-# Model name - Facebook M2M-100 (1.2B for better quality, especially for non-English pairs)
-# Note: 418M model has limited Spanish->Hebrew support, use 1.2B for production
-MODEL_NAME = "facebook/m2m100_1.2B"
+# Model name - Facebook M2M-100 
+# Note: 1.2B has better quality but requires ~8GB RAM. 418M works with 4GB RAM.
+# Spanish->Hebrew has limited quality with 418M but is fast and won't crash.
+MODEL_NAME = "facebook/m2m100_418M"
 
 # Default languages (user-friendly codes)
 DEFAULT_SOURCE = "en"
@@ -51,7 +52,7 @@ def initialize_translator() -> None:
     print(f"[Model] Supported languages:")
     for code, name in SUPPORTED_LANGS.items():
         print(f"         - {code}: {name}")
-    print("[Model] Downloading model (first run only, ~4.9GB)...")
+    print("[Model] Downloading model (first run only, ~1.6GB)...")
     
     # Load tokenizer and model with memory optimizations
     tokenizer = M2M100Tokenizer.from_pretrained(MODEL_NAME)
