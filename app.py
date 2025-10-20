@@ -14,16 +14,24 @@ tokenizer = None
 # Model name - Facebook M2M-100 (418M is the smallest variant)
 MODEL_NAME = "facebook/m2m100_418M"
 
-# Default languages
+# Default languages (user-friendly codes)
 DEFAULT_SOURCE = "en"
 DEFAULT_TARGET = "he"
 
-# Supported languages
+# User-friendly language codes mapping to M2M-100 codes
 SUPPORTED_LANGS = {
     "en": "English",
     "es": "Spanish", 
     "de": "German",
     "he": "Hebrew"
+}
+
+# M2M-100 uses specific language codes
+M2M_LANG_CODES = {
+    "en": "en",
+    "es": "es",
+    "de": "de",
+    "he": "he"
 }
 
 
@@ -52,6 +60,13 @@ def initialize_translator() -> None:
         torch_dtype="auto"
     )
     model.eval()
+    
+    # Debug: Print available language codes
+    print(f"[Debug] Available M2M-100 language codes (first 20):")
+    lang_code_to_id = tokenizer.lang_code_to_id
+    for i, (code, id) in enumerate(list(lang_code_to_id.items())[:20]):
+        print(f"        {code} -> {id}")
+    print(f"        ... ({len(lang_code_to_id)} total languages)")
     
     print("[Model] ✓ Model loaded successfully!")
     print("="*60 + "\n")
@@ -122,19 +137,22 @@ def translate():
         
         # Translate using M2M-100
         with torch.no_grad():  # Disable gradient calculation to save memory
+            # Get M2M-100 language codes
+            src_m2m = M2M_LANG_CODES[source_lang]
+            tgt_m2m = M2M_LANG_CODES[target_lang]
+            
             # Set source language
-            tokenizer.src_lang = source_lang
+            tokenizer.src_lang = src_m2m
             
             # Tokenize input
             t0 = time.time()
-            inputs = tokenizer(text, return_tensors="pt", padding=True)
+            encoded = tokenizer(text, return_tensors="pt")
             t1 = time.time()
             
             # Generate translation with forced target language
             generated_tokens = model.generate(
-                **inputs,
-                forced_bos_token_id=tokenizer.get_lang_id(target_lang),
-                max_length=512
+                **encoded,
+                forced_bos_token_id=tokenizer.get_lang_id(tgt_m2m)
             )
             t2 = time.time()
             
@@ -153,7 +171,7 @@ def translate():
         print("-" * 60)
         
         # Clean up
-        del inputs, generated_tokens
+        del encoded, generated_tokens
         gc.collect()
         
         return jsonify({
